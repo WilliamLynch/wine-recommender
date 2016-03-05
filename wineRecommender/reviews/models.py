@@ -3,11 +3,14 @@ from __future__ import unicode_literals
 from django.db import models
 import numpy as np
 # Create your models here.
+import datetime
 
 class Wine(models.Model):
 	"""docstring for Wine"""
 	# A Wine Name
 	name = models.CharField(max_length=200)
+	YEAR_CHOICES = [(r,r) for r in range(1900, datetime.date.today().year+1)]
+	year = models.IntegerField(('year'), choices=YEAR_CHOICES, default=datetime.datetime.now().year)
 
 	def average_rating(self):
 		all_ratings = map(lambda x: x.rating, self.review_set.all())
