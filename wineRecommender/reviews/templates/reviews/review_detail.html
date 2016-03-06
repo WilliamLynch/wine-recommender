@@ -1,3 +1,5 @@
+{% extends 'reviews/base.html' %}
+
 <h2>
 	<a href="{% url 'reviews:wine_detail' review.wine.id %}">{{ review.wine.name }}</a>
 </h2>
