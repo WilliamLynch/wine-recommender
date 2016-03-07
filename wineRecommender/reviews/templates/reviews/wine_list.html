@@ -1,11 +1,15 @@
-{% extends 'reviews/base.html' %}
+{% extends 'base.html' %}
 
+
+{% block title %}
 <h2>Wine list</h2>
+{% endblock %}
 
+{% block content %}
 {% if wine_list %}
-<div>
+<div class="row">
 	{% for wine in wine_list %}
-	<div>
+	<div class="col-xs-6 col-lg-4">
 	    <h4>
 	    	<a href="{% url 'reviews:wine_detail' wine.id %}">
 	    		{{ wine.name }}
@@ -20,3 +24,4 @@
 {% else %}
 <p>No wines are available.</p>
 {% endif %}
+{% endblock %}
