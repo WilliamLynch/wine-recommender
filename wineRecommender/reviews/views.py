@@ -8,6 +8,9 @@ import datetime
 
 from django.contrib.auth.decorators import login_required
 
+# For updating the cluster assignments while adding a new review
+from .suggestions import update_clusters
+
 def review_list(request):
     latest_review_list = Review.objects.order_by('-pub_date')[:9]
     context = {'latest_review_list':latest_review_list}
@@ -42,6 +45,7 @@ def add_review(request, wine_id):
 		review.comment = comment
 		review.pub_date = datetime.datetime.now()
 		review.save()
+		update_clusters()
 	    # Always return an HttpResponseRedirect after successfully dealing
 	    # with POST data. This prevents data from being posted twice if a
     	# user hits the Back button.
@@ -66,6 +70,16 @@ def user_recommendation_list(request):
 	# Gets the name of the cluster the user belongs to
 	user_cluster_name = User.objects.get(username=request.user.username).cluster_set.first().name
 	
+	# get request user cluster name (just the first one righ now)
+	try:
+		user_cluster_name = \
+			User.objects.get(username=request.user.username).cluster_set.first().name
+	except: # if no cluster has been assigned for a user, update clusters
+		update_clusters()
+		user_cluster_name = \
+			User.objects.get(username=request.user.username).cluster_set.first().name
+
+
 	# get usernames for other members of the cluster
 	user_cluster_other_members = Cluster.objects.get(name=user_cluster_name).users \
     	.exclude(username=request.user.username).all()
@@ -76,7 +90,7 @@ def user_recommendation_list(request):
 		.exclude(wine__id__in=user_reviews_wine_ids)
 	other_users_reviews_wine_ids = set(map(lambda x: x.wine.id, other_users_reviews))
 
-	# then get a wine list excluding the previous IDs, ordered by rating
+	# then get a wine list excluding the previous IDs, ordered by average rating
 	wine_list = sorted(
 		list(Wine.objects.filter(id__in=other_users_reviews_wine_ids)), 
 		key=lambda x: x.average_rating, 
