@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import Wine, Review
+from .models import Wine, Review, Cluster
 
 class ReviewAdmin(admin.ModelAdmin):
 	model = Review
@@ -14,9 +14,17 @@ class WineAdmin(admin.ModelAdmin):
 	list_display = ('name', 'year')
 	# list_filter = ['year']
 	# search_fields = ['comment']
+
+
+class ClusterAdmin(admin.ModelAdmin):
+	model = Cluster
+	list_display = ['name', 'get_members']
+
 # This will allow us to see our Review app model entities
 # in the admin now. So youll see a section for Wines and Reviews
 admin.site.register(Wine, WineAdmin)
 # Reviews guts will be different because we've created a
 #  custom class ReviewAdmin that dictates what we see
 admin.site.register(Review, ReviewAdmin)
+
+admin.site.register(Cluster, ClusterAdmin)

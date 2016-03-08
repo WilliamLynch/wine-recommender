@@ -4,6 +4,7 @@ from django.db import models
 import numpy as np
 # Create your models here.
 import datetime
+from django.contrib.auth.models import User
 
 class Wine(models.Model):
 	"""docstring for Wine"""
@@ -23,6 +24,7 @@ class Wine(models.Model):
 	# 	self.arg = arg
 
 class Review(models.Model):
+	"""docstring for Review"""
 	RATING_CHOICES = (
 		(1, '1'),
 	    (2, '2'),
@@ -40,3 +42,16 @@ class Review(models.Model):
 	# Text Review
 	comment = models.CharField(max_length=200)
 	rating = models.IntegerField(choices=RATING_CHOICES)
+
+class Cluster(models.Model):
+	"""docstring for Cluster
+	For a Cluster, we'll store name
+	and a list of users
+
+	get_members = gets all of the usernames for a cluster
+	"""
+	name = models.CharField(max_length=100)
+	users = models.ManyToManyField(User)
+
+	def get_members(self):
+		return "\n".join([u.username for u in self.users.all()])
