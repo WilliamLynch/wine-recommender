@@ -2,10 +2,11 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect ,Http404
 from django.core.urlresolvers import reverse
 # Create your views here.
-from .models import Review, Wine
+from .models import Review, Wine, Cluster
 from .forms import ReviewForm
 import datetime
 
+from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 
 # For updating the cluster assignments while adding a new review
@@ -37,7 +38,7 @@ def add_review(request, wine_id):
 	if form.is_valid():
 		rating = form.cleaned_data['rating']
 		comment = form.cleaned_data['comment']
-		user_name = form.cleaned_data['user_name']
+		user_name = request.user.username
 		review = Review()
 		review.wine = wine
 		review.user_name = user_name
@@ -68,21 +69,17 @@ def user_recommendation_list(request):
 	user_reviews_wine_ids = set(map(lambda x: x.wine.id, user_reviews))
 
 	# Gets the name of the cluster the user belongs to
-	user_cluster_name = User.objects.get(username=request.user.username).cluster_set.first().name
+	# user_cluster_name = User.objects.get(username=request.user.username).cluster_set.first().name
 	
-	# get request user cluster name (just the first one righ now)
 	try:
-		user_cluster_name = \
-			User.objects.get(username=request.user.username).cluster_set.first().name
+		user_cluster_name = User.objects.get(username=request.user.username).cluster_set.first().name
 	except: # if no cluster has been assigned for a user, update clusters
 		update_clusters()
-		user_cluster_name = \
-			User.objects.get(username=request.user.username).cluster_set.first().name
+		user_cluster_name = User.objects.get(username=request.user.username).cluster_set.first().name
 
 
 	# get usernames for other members of the cluster
-	user_cluster_other_members = Cluster.objects.get(name=user_cluster_name).users \
-    	.exclude(username=request.user.username).all()
+	user_cluster_other_members = Cluster.objects.get(name=user_cluster_name).users.exclude(username=request.user.username).all()
 	other_members_usernames = set(map(lambda x: x.username, user_cluster_other_members))
 
 	# get reviews by those users, excluding wines reviewed by the request user
