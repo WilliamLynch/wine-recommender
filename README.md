@@ -7,6 +7,7 @@ To Do
 * Style the site
 * Fix bugs in clustering algo
 * Write code to allow people to add and review wines on their own vs creating a database
+* Look into changing algo from collaborative filtering to content for now, until wine database is built
 
 
 Find folder with manage.py in it
